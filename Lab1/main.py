@@ -2,15 +2,15 @@ print("Iot_Gateway")
 import paho.mqtt.client as mqttclient
 import time
 import json
-from urllib.request import urlopen 
+# from urllib.request import urlopen 
 import requests
 import json
 
-from ipregistry import IpregistryClient
+# from ipregistry import IpregistryClient
 
-client = IpregistryClient("tryout")  
-ipInfo = client.lookup() 
-print(ipInfo)
+# client = IpregistryClient("tryout")  
+# ipInfo = client.lookup() 
+# print(ipInfo)
 BROKER_ADDRESS = "demo.thingsboard.io"
 PORT = 1883
 THINGS_BOARD_ACCESS_TOKEN = "R5AX5OWilCPYXRwfUoxJ"
@@ -53,8 +53,8 @@ client.on_message = recv_message
 temp = 30
 humi = 50
 light_intensity = 100
-longitude = 106.7
-latitude = 10.6
+longitude = 106.6297
+latitude = 10.8231
 counter = 0
 while True:
     collect_data = {'temperature': temp, 
@@ -67,4 +67,4 @@ while True:
     humi += 1
     light_intensity += 1
     client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
-    time.sleep(5)
+    time.sleep(10)
