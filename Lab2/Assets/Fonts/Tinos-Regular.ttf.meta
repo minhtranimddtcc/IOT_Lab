@@ -1,0 +1,23 @@
+fileFormatVersion: 2
+guid: 4c3daa3f5ad5889499173f3bdcd039c7
+TrueTypeFontImporter:
+  externalObjects: {}
+  serializedVersion: 4
+  fontSize: 16
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontNames:
+  - Tinos
+  fallbackFontReferences:
+  - {fileID: 12800000, guid: 8607aabfb40a27540b0af5b6ca1f1af0, type: 3}
+  - {fileID: 12800000, guid: d26997b3429d39c4daa314c1f048b6f7, type: 3}
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  useLegacyBoundsCalculation: 0
+  shouldRoundAdvanceValue: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

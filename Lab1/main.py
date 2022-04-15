@@ -1,16 +1,18 @@
-print("Iot_Gateway")
-import paho.mqtt.client as mqttclient
-import time
-import json
-# from urllib.request import urlopen 
 import requests
 import json
+import time
+import paho.mqtt.client as mqttclient
+import serial.tools.list_ports
 
-# from ipregistry import IpregistryClient
+mess = ""
+bbc_port = "COM6"
 
-# client = IpregistryClient("tryout")  
-# ipInfo = client.lookup() 
-# print(ipInfo)
+if len(bbc_port) > 0:
+    ser = serial.Serial(port=bbc_port, baudrate=115200)
+
+print("Iot_Gateway")
+
+
 BROKER_ADDRESS = "demo.thingsboard.io"
 PORT = 1883
 THINGS_BOARD_ACCESS_TOKEN = "R5AX5OWilCPYXRwfUoxJ"
@@ -23,13 +25,25 @@ def subscribed(client, userdata, mid, granted_qos):
 def recv_message(client, userdata, message):
     print("Received: ", message.payload.decode("utf-8"))
     temp_data = {'value': True}
+    cmd = 0
     try:
         jsonobj = json.loads(message.payload)
-        if jsonobj['method'] == "setValue":
-            temp_data['value'] = jsonobj['params']
-            client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
+        # if jsonobj['method'] == "setValue":
+        #     temp_data['value'] = jsonobj['params']
+        #     client.publish('v1/devices/me/attributes',
+        #                    json.dumps(temp_data), 1)
+        if jsonobj['method'] == "setLED":
+            temp_data['valueLED'] = jsonobj['params']
+            client.publish('v1/devices/me/attributes',
+                           json.dumps(temp_data), 1)
+        if jsonobj['method'] == "setPump":
+            temp_data['valuePUMP'] = jsonobj['params']
+            client.publish('v1/devices/me/attributes',
+                           json.dumps(temp_data), 1)
     except:
         pass
+    if len(bbc_port) > 0:
+        ser.write((str(cmd) + "#").encode())
 
 
 def connected(client, usedata, flags, rc):
@@ -38,6 +52,28 @@ def connected(client, usedata, flags, rc):
         client.subscribe("v1/devices/me/rpc/request/+")
     else:
         print("Connection is failed")
+
+
+def processData(data):
+    data = data.replace("!", "")
+    data = data.replace("#", "")
+    splitData = data.split(":")
+    print(splitData)
+
+
+def readSerial():
+    bytesToRead = ser.inWaiting()
+    if (bytesToRead > 0):
+        global mess
+        mess = mess + ser.read(bytesToRead).decode("UTF-8")
+        while ("#" in mess) and ("!" in mess):
+            start = mess.find("!")
+            end = mess.find("#")
+            processData(mess[start:end + 1])
+            if (end == len(mess)):
+                mess = ""
+            else:
+                mess = mess[end+1:]
 
 
 client = mqttclient.Client("Gateway_Thingsboard")
@@ -57,14 +93,17 @@ longitude = 106.6297
 latitude = 10.8231
 counter = 0
 while True:
-    collect_data = {'temperature': temp, 
-                    'humidity': humi, 
-                    'light':light_intensity,
-                    'longitude': longitude,
-                    'latitude': latitude
-                    }
-    temp += 1
-    humi += 1
-    light_intensity += 1
-    client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
-    time.sleep(10)
+    # collect_data = {'temperature': temp,
+    #                 'humidity': humi,
+    #                 'light': light_intensity,
+    #                 'longitude': longitude,
+    #                 'latitude': latitude
+    #                 }
+    # temp += 1
+    # humi += 1
+    # light_intensity += 1
+    # client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
+
+    if len(bbc_port) > 0:
+        readSerial()
+    time.sleep(1)
