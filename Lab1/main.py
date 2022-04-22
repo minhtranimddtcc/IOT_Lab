@@ -5,8 +5,9 @@ import paho.mqtt.client as mqttclient
 import serial.tools.list_ports
 
 mess = ""
-bbc_port = "COM6"
-
+bbc_port = "COM9"
+temp = 0
+light = 0
 if len(bbc_port) > 0:
     ser = serial.Serial(port=bbc_port, baudrate=115200)
 
@@ -26,6 +27,7 @@ def recv_message(client, userdata, message):
     print("Received: ", message.payload.decode("utf-8"))
     temp_data = {'value': True}
     cmd = 0
+    # TODO: Update the cmd to control 2 devices
     try:
         jsonobj = json.loads(message.payload)
         # if jsonobj['method'] == "setValue":
@@ -34,10 +36,18 @@ def recv_message(client, userdata, message):
         #                    json.dumps(temp_data), 1)
         if jsonobj['method'] == "setLED":
             temp_data['valueLED'] = jsonobj['params']
+            if jsonobj['params'] == True:
+                cmd = 1
+            else:
+                cmd = 0
             client.publish('v1/devices/me/attributes',
                            json.dumps(temp_data), 1)
-        if jsonobj['method'] == "setPump":
+        if jsonobj['method'] == "setPUMP":
             temp_data['valuePUMP'] = jsonobj['params']
+            if jsonobj['params'] == True:
+                cmd = 3
+            else:
+                cmd = 2
             client.publish('v1/devices/me/attributes',
                            json.dumps(temp_data), 1)
     except:
@@ -59,6 +69,18 @@ def processData(data):
     data = data.replace("#", "")
     splitData = data.split(":")
     print(splitData)
+    # TODO: Add your source code to publish data to the server
+    tmp = splitData[2]
+    global temp, light
+
+    if splitData[1] == 'TEMP':
+        temp = int(tmp)
+    if splitData[1] == 'LIGHT':
+        light = int(tmp)
+    collect_data = {'temperature': temp,
+                    'humidity': light,
+                    }
+    client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
 
 
 def readSerial():
