@@ -19,7 +19,13 @@ namespace ChuongGa
     }
 
 
-    public class Control_Data
+    public class ControlDataLED
+    {
+        public string device { get; set; }
+        public string status { get; set; }
+
+    }
+    public class ControlDataPUMP
     {
         public string device { get; set; }
         public string status { get; set; }
@@ -38,32 +44,32 @@ namespace ChuongGa
         public Manager manager;
         private List<string> eventMessages = new List<string>();
         [SerializeField]
-        public Status_Data _status_data;
+        public Status_Data statusData;
         [SerializeField]
-        
-        public Control_Data _control_data;
-        
+
         public InputField brokeruri;
         public InputField username;
         public InputField password;
 
-        private void PublishControl(string device,int tno)
+        public void PublishLED()
         {
-            _control_data = new Control_Data();
-            _control_data.device=device;
-            _control_data = GetComponent<Manager>().Update_Control_Value(_control_data);
-            string msg_config = JsonConvert.SerializeObject(_control_data);
-            client.Publish(topics[tno], System.Text.Encoding.UTF8.GetBytes(msg_config), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
-            Debug.Log("publish "+device);
 
+            ControlDataLED controlData = new ControlDataLED();
+            controlData.device = "LED";
+            controlData = GetComponent<Manager>().UpdateControlValueLED(controlData);
+            string msg_config = JsonConvert.SerializeObject(controlData);
+            client.Publish(topics[1], System.Text.Encoding.UTF8.GetBytes(msg_config), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
+            Debug.Log("publish LED");
         }
 
-        public void PublishLED(){
-            PublishControl("LED",1);
-        }
-
-        public void PublishPUMP(){
-            PublishControl("PUMP",2);
+        public void PublishPUMP()
+        {
+            ControlDataPUMP controlData = new ControlDataPUMP();
+            controlData.device = "PUMP";
+            controlData = GetComponent<Manager>().UpdateControlValuePUMP(controlData);
+            string msg_config = JsonConvert.SerializeObject(controlData);
+            client.Publish(topics[2], System.Text.Encoding.UTF8.GetBytes(msg_config), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
+            Debug.Log("publish PUMP");
         }
         public void SetEncrypted(bool isEncrypted)
         {
@@ -74,7 +80,7 @@ namespace ChuongGa
         protected override void OnConnecting()
         {
             base.OnConnecting();
-            //SetUiMessage("Connecting to broker on " + brokerAddress + ":" + brokerPort.ToString() + "...\n");
+
         }
 
         protected override void OnConnected()
@@ -139,38 +145,44 @@ namespace ChuongGa
             if (topic == topics[0])
                 ProcessMessageStatus(msg);
 
+            else if (topic == topics[1])
+                ProcessMessageControlLED(msg);
             else
-                ProcessMessageControl(msg);
+                ProcessMessageControlPUMP(msg);
         }
 
         private void ProcessMessageStatus(string msg)
         {
-             _status_data = JsonConvert.DeserializeObject<Status_Data>(msg);
+            statusData = JsonConvert.DeserializeObject<Status_Data>(msg);
             msg_received_from_topic_status = msg;
-            GetComponent<Manager>().Update_Status(_status_data);
+            GetComponent<Manager>().Update_Status(statusData);
 
         }
 
-        private void ProcessMessageControl(string msg)
+        private void ProcessMessageControlLED(string msg)
         {
-            _control_data = JsonConvert.DeserializeObject<Control_Data>(msg);
+            ControlDataLED controlData = JsonConvert.DeserializeObject<ControlDataLED>(msg);
             msg_received_from_topic_control = msg;
-            GetComponent<Manager>().Update_Control(_control_data);
+            GetComponent<Manager>().UpdateControlLED(controlData);
+        }
+        private void ProcessMessageControlPUMP(string msg)
+        {
+            ControlDataPUMP controlData = JsonConvert.DeserializeObject<ControlDataPUMP>(msg);
+            msg_received_from_topic_control = msg;
+            GetComponent<Manager>().UpdateControlPUMP(controlData);
         }
 
         public override void Connect()
         {
 
-            mqttUserName=username.text;
-            mqttPassword=password.text;
-            brokerAddress=brokeruri.text;
-            mqttUserName="bkiot";
-            mqttPassword="12345678";
-            brokerAddress="mqttserver.tk";
-
+            mqttUserName = username.text;
+            mqttPassword = password.text;
+            brokerAddress = brokeruri.text;
+            // mqttUserName = "bkiot";
+            // mqttPassword = "12345678";
+            // brokerAddress = "mqttserver.tk";
             base.Connect();
             manager.SwitchLayer();
-
         }
 
         private void OnDestroy()

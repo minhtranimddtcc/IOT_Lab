@@ -3,105 +3,119 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
-namespace ChuongGa{
+namespace ChuongGa
+{
     public class Manager : MonoBehaviour
     {
         // Start is called before the first frame update
-            [SerializeField]
-            private SwitchHandler status_LED;
-            [SerializeField]
-            private SwitchHandler status_PUMP;
-            
-            [SerializeField]
-            private Text tempText;
-            [SerializeField]
-            private Text humText;
+        [SerializeField]
+        private SwitchHandler statusLED;
+        [SerializeField]
+        private SwitchHandler statusPUMP;
 
-            [SerializeField]
-            private CanvasGroup allow_sw;
-            [SerializeField]
-            private CanvasGroup allow_sw2;
-                    [SerializeField]
-            private CanvasGroup _canvasLayer1;
-                    [SerializeField]
-            private CanvasGroup _canvasLayer2;
-            [SerializeField]
-            private Window_Graph graph;
-                    private Tween twenFade;
-                    private List<int> lTemp;
+        [SerializeField]
+        private Text temperatureText;
+        [SerializeField]
+        private Text humidityText;
+
+        [SerializeField]
+        private CanvasGroup allowSwitchLED;
+        [SerializeField]
+        private CanvasGroup allowSwitchPUMP;
+        [SerializeField]
+        private CanvasGroup canvasLayer;
+        [SerializeField]
+        private CanvasGroup canvasLayer2;
+        [SerializeField]
+        private Window_Graph graph;
+        private Tween tweenFade;
+        private List<int> listTemp;
 
         void Start()
         {
-            lTemp=new List<int>();
+            listTemp = new List<int>();
         }
 
         // Update is called once per frame
         void Update()
         {
-            
+
         }
-        public void Update_Status(Status_Data _status_data)
-            {
-                tempText.text=_status_data.temperature.ToString()+" °C";
-                humText.text=_status_data.humidity.ToString()+" %";
-                lTemp.Add((int)_status_data.temperature); 
-                if (lTemp.Count>10) {
-                    lTemp.RemoveAt(0);
-                }
-                graph.DrawGraph(lTemp);
-            }
-        public void Update_Control(Control_Data _control_data)
-            
-            {
-                if (_control_data.device=="LED")
-                {
-                    allow_sw.interactable = true;
-                    if (_control_data.status == "ON")
-                        status_LED.switchState = true;
-                    else{
-
-                        status_LED.switchState = false;
-                    }
-                }
-                else{
-                    allow_sw2.interactable = true;
-                    if (_control_data.status == "ON")
-                        status_PUMP.switchState = true;
-                    else{
-
-                        status_PUMP.switchState = false;
-                    }
-                }
-
-            }
-        public Control_Data Update_Control_Value(Control_Data _control)
-            {
-                if (_control.device=="LED"){
-                    _control.status = (status_LED.switchState ? "ON" : "OFF");
-                    allow_sw.interactable = false;
-                    return _control;
-                }
-                else{
-                    _control.status = (status_PUMP.switchState ? "ON" : "OFF");
-                    allow_sw2.interactable = false;
-                    return _control;
-                }
-            }
-        
-
-        IEnumerator _IESwitchLayer()
+        public void Update_Status(Status_Data statusData)
         {
-            if (_canvasLayer1.interactable == true)
+            temperatureText.text = statusData.temperature.ToString() + " °C";
+            humidityText.text = statusData.humidity.ToString() + " %";
+            listTemp.Add((int)statusData.humidity);
+            if (listTemp.Count > 10)
             {
-                FadeOut(_canvasLayer1, 0.25f);
-                yield return new WaitForSeconds(0.5f);
-                FadeIn(_canvasLayer2, 0.25f);
+                listTemp.RemoveAt(0);
+            }
+            graph.DrawGraph(listTemp);
+        }
+        public void UpdateControlLED(ControlDataLED controlDataLED)
+        {
+            allowSwitchLED.interactable = true;
+            if (controlDataLED.status == "ON")
+                statusLED.state = true;
+            else
+            {
+                statusLED.state = false;
+            }
+        }
+        public void UpdateControlPUMP(ControlDataPUMP controlDataPUMP)
+        {
+            allowSwitchPUMP.interactable = true;
+            if (controlDataPUMP.status == "ON")
+                statusPUMP.state = true;
+            else
+            {
+                statusPUMP.state = false;
+            }
+        }
+
+        public ControlDataLED UpdateControlValueLED(ControlDataLED controlData)
+        {
+            if (controlData.device == "LED")
+            {
+                controlData.status = (statusLED.state ? "ON" : "OFF");
+                allowSwitchLED.interactable = false;
+                return controlData;
             }
             else
             {
-                FadeOut(_canvasLayer2, 0.25f);
+                controlData.status = (statusPUMP.state ? "ON" : "OFF");
+                allowSwitchPUMP.interactable = false;
+                return controlData;
+            }
+        }
+        public ControlDataPUMP UpdateControlValuePUMP(ControlDataPUMP controlData)
+        {
+            if (controlData.device == "LED")
+            {
+                controlData.status = (statusLED.state ? "ON" : "OFF");
+                allowSwitchLED.interactable = false;
+                return controlData;
+            }
+            else
+            {
+                controlData.status = (statusPUMP.state ? "ON" : "OFF");
+                allowSwitchPUMP.interactable = false;
+                return controlData;
+            }
+        }
+        IEnumerator _IESwitchLayer()
+        {
+            if (canvasLayer.interactable == true)
+            {
+                FadeOut(canvasLayer, 0.25f);
                 yield return new WaitForSeconds(0.5f);
-                FadeIn(_canvasLayer1, 0.25f);
+                FadeIn(canvasLayer2, 0.25f);
+            }
+            else
+            {
+                FadeOut(canvasLayer2, 0.25f);
+                yield return new WaitForSeconds(0.5f);
+                FadeIn(canvasLayer, 0.25f);
             }
         }
 
@@ -112,32 +126,32 @@ namespace ChuongGa{
         }
 
 
-        public void Fade(CanvasGroup _canvas, float endValue, float duration, TweenCallback onFinish)
+        public void Fade(CanvasGroup canvas, float endValue, float duration, TweenCallback onFinish)
         {
-            if (twenFade != null)
+            if (tweenFade != null)
             {
-                twenFade.Kill(false);
+                tweenFade.Kill(false);
             }
 
-            twenFade = _canvas.DOFade(endValue, duration);
-            twenFade.onComplete += onFinish;
+            tweenFade = canvas.DOFade(endValue, duration);
+            tweenFade.onComplete += onFinish;
         }
 
-        public void FadeIn(CanvasGroup _canvas, float duration)
+        public void FadeIn(CanvasGroup canvas, float duration)
         {
-            Fade(_canvas, 1f, duration, () =>
+            Fade(canvas, 1f, duration, () =>
             {
-                _canvas.interactable = true;
-                _canvas.blocksRaycasts = true;
+                canvas.interactable = true;
+                canvas.blocksRaycasts = true;
             });
         }
 
-        public void FadeOut(CanvasGroup _canvas, float duration)
+        public void FadeOut(CanvasGroup canvas, float duration)
         {
-            Fade(_canvas, 0f, duration, () =>
+            Fade(canvas, 0f, duration, () =>
             {
-                _canvas.interactable = false;
-                _canvas.blocksRaycasts = false;
+                canvas.interactable = false;
+                canvas.blocksRaycasts = false;
             });
         }
     }

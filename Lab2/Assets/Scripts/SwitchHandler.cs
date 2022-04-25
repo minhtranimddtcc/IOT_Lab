@@ -7,42 +7,34 @@ using UnityEngine.UI;
 
 public class SwitchHandler : MonoBehaviour
 {
-    public bool switchState;
-    private bool switchState2;
-    // public GameObject switchBtn;
-    // private float curX;
-    // public Image img;
-    private Color32[] cols;
+    public bool state;
+    private bool state2;
+    private Color32[] color;
     public Image imageBtn;
-    // public RectTransform a;
 
 
     public void Start()
     {
-        // curX=Mathf.Abs(switchBtn.transform.localPosition.x);
-        // switchState2=switchState=(switchBtn.transform.localPosition.x<0)?false:true;;
-        cols = new Color32[2];
-        cols[0] = new Color32(60, 250, 236, 255);
-        cols[1] = new Color32(255, 0, 0, 255);
+        color = new Color32[2];
+        color[0] = new Color32(60, 250, 236, 255);
+        color[1] = new Color32(255, 0, 0, 255);
     }
     public void Update()
     {
-        if (switchState != switchState2)
+        if (state != state2)
         {
-            switchState2 = switchState;
-            if (switchState == true)
+            state2 = state;
+            if (state == true)
             {
-                imageBtn.DOColor(cols[0], 2f);
+                imageBtn.DOColor(color[0], 2f);
             }
-            else imageBtn.DOColor(cols[1], 2f);
+            else imageBtn.DOColor(color[1], 2f);
         }
     }
 
-    public void OnSwitchButtonClicked()
+    public void OnClick()
     {
-        switchState = !switchState2;
-
+        state = !state2;
     }
-
 
 }

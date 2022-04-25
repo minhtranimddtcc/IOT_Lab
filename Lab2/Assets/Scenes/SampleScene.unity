@@ -799,7 +799,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2140987274}
         m_TargetAssemblyTypeName: SwitchHandler, Assembly-CSharp
-        m_MethodName: OnSwitchButtonClicked
+        m_MethodName: OnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -1977,14 +1977,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e83168d3677e8cc409cfff6dac8d6c48, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  status_LED: {fileID: 1692909287}
-  status_PUMP: {fileID: 2140987274}
-  tempText: {fileID: 567480562}
-  humText: {fileID: 200888396}
-  allow_sw: {fileID: 1692909288}
-  allow_sw2: {fileID: 2140987275}
-  _canvasLayer1: {fileID: 422806907}
-  _canvasLayer2: {fileID: 1875041613}
+  statusLED: {fileID: 1692909287}
+  statusPUMP: {fileID: 2140987274}
+  temperatureText: {fileID: 567480562}
+  humidityText: {fileID: 200888396}
+  allowSwitchLED: {fileID: 1692909288}
+  allowSwitchPUMP: {fileID: 2140987275}
+  canvasLayer: {fileID: 422806907}
+  canvasLayer2: {fileID: 1875041613}
   graph: {fileID: 224066558}
 --- !u!1 &858036151
 GameObject:
@@ -2487,7 +2487,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1692909287}
         m_TargetAssemblyTypeName: SwitchHandler, Assembly-CSharp
-        m_MethodName: OnSwitchButtonClicked
+        m_MethodName: OnClick
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2977,7 +2977,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81d0187d960c30c49ba76f0ef128c1b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  switchState: 0
+  state: 0
   imageBtn: {fileID: 114457952}
 --- !u!225 &1692909288
 CanvasGroup:
@@ -3408,7 +3408,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 81d0187d960c30c49ba76f0ef128c1b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  switchState: 0
+  state: 0
   imageBtn: {fileID: 766044306}
 --- !u!225 &2140987275
 CanvasGroup:
