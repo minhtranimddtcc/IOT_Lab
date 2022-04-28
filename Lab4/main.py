@@ -3,9 +3,10 @@ import json
 import time
 import paho.mqtt.client as mqttclient
 import serial.tools.list_ports
+from simpleAI import *
 
 mess = ""
-bbc_port = "COM9"
+bbc_port = "COM6"
 temp = 0
 light = 0
 if len(bbc_port) > 0:
@@ -78,7 +79,7 @@ def processData(data):
     if splitData[1] == 'LIGHT':
         light = int(tmp)
     collect_data = {'temperature': temp,
-                    'light': light,
+                    'humidity': light,
                     }
     client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
 
@@ -114,6 +115,7 @@ light_intensity = 100
 longitude = 106.6297
 latitude = 10.8231
 counter = 0
+state = ["UnMaskable", "Maskable", "Background"]
 while True:
     # collect_data = {'temperature': temp,
     #                 'humidity': humi,
@@ -128,4 +130,10 @@ while True:
 
     if len(bbc_port) > 0:
         readSerial()
+    counter += 1
+    if counter >= 5:
+        counter = 0
+        capture_image()
+        index, confidence = ai_dectection()
+        print(index, confidence, state[index])
     time.sleep(1)
