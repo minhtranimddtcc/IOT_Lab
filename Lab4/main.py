@@ -3,10 +3,9 @@ import json
 import time
 import paho.mqtt.client as mqttclient
 import serial.tools.list_ports
-from simpleAI import *
 
 mess = ""
-bbc_port = "COM6"
+bbc_port = "COM12"
 temp = 0
 light = 0
 if len(bbc_port) > 0:
@@ -43,8 +42,8 @@ def recv_message(client, userdata, message):
                 cmd = 0
             client.publish('v1/devices/me/attributes',
                            json.dumps(temp_data), 1)
-        if jsonobj['method'] == "setPUMP":
-            temp_data['valuePUMP'] = jsonobj['params']
+        if jsonobj['method'] == "setFAN":
+            temp_data['valueFAN'] = jsonobj['params']
             if jsonobj['params'] == True:
                 cmd = 3
             else:
@@ -79,9 +78,10 @@ def processData(data):
     if splitData[1] == 'LIGHT':
         light = int(tmp)
     collect_data = {'temperature': temp,
-                    'humidity': light,
+                    'light': light,
                     }
-    client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
+    client.publish('v1/devices/me/telemetry',
+                   json.dumps(collect_data), 1)
 
 
 def readSerial():
@@ -115,7 +115,6 @@ light_intensity = 100
 longitude = 106.6297
 latitude = 10.8231
 counter = 0
-state = ["UnMaskable", "Maskable", "Background"]
 while True:
     # collect_data = {'temperature': temp,
     #                 'humidity': humi,
@@ -130,10 +129,4 @@ while True:
 
     if len(bbc_port) > 0:
         readSerial()
-    counter += 1
-    if counter >= 5:
-        counter = 0
-        capture_image()
-        index, confidence = ai_dectection()
-        print(index, confidence, state[index])
     time.sleep(1)
