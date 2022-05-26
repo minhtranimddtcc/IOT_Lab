@@ -1,0 +1,22 @@
+radio.onReceivedString(function (receivedString) {
+    if (!(receivedString.includes("#"))) {
+        list = receivedString.split(":")
+        if (parseFloat(list[0]) == id) {
+            if (parseFloat(list[1]) == 0) {
+                basic.showString("" + (list[1]))
+            } else {
+                basic.showString("" + (list[1]))
+            }
+        }
+    }
+})
+let list: string[] = []
+let id = 0
+radio.setGroup(1)
+id = 1
+basic.forever(function () {
+    radio.sendString("!" + id + ":TEMP:" + input.temperature() + "#")
+    basic.pause(5000)
+    radio.sendString("!" + id + ":LIGHT:" + input.lightLevel() + "#")
+    basic.pause(5000)
+})
