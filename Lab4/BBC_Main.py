@@ -8,7 +8,7 @@ def on_data_received():
     elif cmd == "2":
         radio.send_value("FAN", 0)
     elif cmd == "3":
-        radio.send_value("FAN", 0)
+        radio.send_value("FAN", 1)
 
 
 serial.on_data_received(serial.delimiters(Delimiters.HASH), on_data_received)
